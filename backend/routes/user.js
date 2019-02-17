@@ -28,18 +28,17 @@ router.post('/signup', (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   let userFetched;
-  User.findOne({ email: req.body.email })
-    .then(result => {
-      if (!result) {
-        return res.status(401).json({
-          // 401 MEANS UNAUTHORIZED
-          message: 'Auth failed'
-        });
-      }
-      userFetched = result;
-      return bcrypt.compare(req.body.password, userFetched.password);
-    })
-    .then(hash => {
+  User.findOne({ email: req.body.email }, (err, result) => {
+    console.log(result);
+    if (err) {
+      return res.status(401).json({
+        message: 'auth failed',
+        err: error
+      });
+    }
+
+    userFetched = result;
+    bcrypt.compare(req.body.password, userFetched.password).then(hash => {
       const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, 'my_token_is_secret', {
         expiresIn: '1h'
       });
@@ -50,15 +49,43 @@ router.post('/login', (req, res, next) => {
           token: token,
           expiresIn: 3600
         });
+      } else {
+        return res.status(401).json({
+          message: 'password not correct'
+        });
       }
-    })
-    .catch(error => {
-      console.log(error);
-      return res.status(404).json({
-        message: 'auth failed',
-        err: error
-      });
     });
+  });
+  // .then(result => {
+  //   if (!result) {
+  //     return res.status(401).json({
+  //       // 401 MEANS UNAUTHORIZED
+  //       message: 'Auth failed'
+  //     });
+  //   }
+  //   userFetched = result;
+  //   return bcrypt.compare(req.body.password, userFetched.password);
+  // })
+  // .then(hash => {
+  //   const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, 'my_token_is_secret', {
+  //     expiresIn: '1h'
+  //   });
+  //   if (hash) {
+  //     res.status(200).json({
+  //       message: 'Auth good',
+  //       user: userFetched,
+  //       token: token,
+  //       expiresIn: 3600
+  //     });
+  //   }
+  // })
+  // .catch(error => {
+  //   console.log(error);
+  //   return res.status(404).json({
+  //     message: 'auth failed',
+  //     err: error
+  //   });
+  // });
 });
 
 module.exports = router;
