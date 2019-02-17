@@ -20,9 +20,14 @@ export class UserService {
       email: email,
       password: password
     };
-    this.http.post<{ message: string; result: User }>('http://localhost:3000/api/user/signup', user).subscribe(res => {
-      this.route.navigate(['/']);
-    });
+    this.http.post<{ message: string; result: User }>('http://localhost:3000/api/user/signup', user).subscribe(
+      res => {
+        this.route.navigate(['/']);
+      },
+      error => {
+        this.userAuthenticate.next(false);
+      }
+    );
   }
 
   getToken(): string {
@@ -61,20 +66,25 @@ export class UserService {
         'http://localhost:3000/api/user/login',
         user
       )
-      .subscribe(res => {
-        console.log(res);
-        this.token = res.token;
-        if (res.token) {
-          this.setTimer(res.expiresIn);
+      .subscribe(
+        res => {
+          console.log(res);
+          this.token = res.token;
+          if (res.token) {
+            this.setTimer(res.expiresIn);
+          }
+          this.idUser = res.user._id;
+          const now = new Date();
+          const expireDate = new Date(now.getTime() + res.expiresIn * 1000);
+          this.saveAuthData(res.token, expireDate);
+          this.isAuthenticate = true;
+          this.userAuthenticate.next(true);
+          this.route.navigate(['/']);
+        },
+        error => {
+          this.userAuthenticate.next(false);
         }
-        this.idUser = res.user._id;
-        const now = new Date();
-        const expireDate = new Date(now.getTime() + res.expiresIn * 1000);
-        this.saveAuthData(res.token, expireDate);
-        this.isAuthenticate = true;
-        this.userAuthenticate.next(true);
-        this.route.navigate(['/']);
-      });
+      );
   }
 
   autoUserAuth() {

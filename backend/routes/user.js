@@ -53,7 +53,8 @@ router.post('/login', (req, res, next) => {
       }
     })
     .catch(error => {
-      return res.status(200).json({
+      console.log(error);
+      return res.status(404).json({
         message: 'auth failed',
         err: error
       });
