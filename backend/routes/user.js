@@ -20,6 +20,7 @@ router.post('/signup', (req, res, next) => {
       })
       .catch(error => {
         res.status(500).json({
+          message: 'sign up failed',
           err: error
         });
       });
@@ -28,12 +29,17 @@ router.post('/signup', (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   let userFetched;
-  User.findOne({ email: req.body.email }, (err, result) => {
-    console.log(result);
-    if (err) {
+  User.findOne({ email: req.body.email }, (error, result) => {
+    if (error) {
       return res.status(401).json({
         message: 'auth failed',
-        err: error
+        err: err
+      });
+    }
+
+    if (!result) {
+      return res.status(401).json({
+        message: 'email not correct'
       });
     }
 
@@ -42,6 +48,7 @@ router.post('/login', (req, res, next) => {
       const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, 'my_token_is_secret', {
         expiresIn: '1h'
       });
+
       if (hash) {
         res.status(200).json({
           message: 'Auth good',
@@ -56,36 +63,6 @@ router.post('/login', (req, res, next) => {
       }
     });
   });
-  // .then(result => {
-  //   if (!result) {
-  //     return res.status(401).json({
-  //       // 401 MEANS UNAUTHORIZED
-  //       message: 'Auth failed'
-  //     });
-  //   }
-  //   userFetched = result;
-  //   return bcrypt.compare(req.body.password, userFetched.password);
-  // })
-  // .then(hash => {
-  //   const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, 'my_token_is_secret', {
-  //     expiresIn: '1h'
-  //   });
-  //   if (hash) {
-  //     res.status(200).json({
-  //       message: 'Auth good',
-  //       user: userFetched,
-  //       token: token,
-  //       expiresIn: 3600
-  //     });
-  //   }
-  // })
-  // .catch(error => {
-  //   console.log(error);
-  //   return res.status(404).json({
-  //     message: 'auth failed',
-  //     err: error
-  //   });
-  // });
 });
 
 module.exports = router;

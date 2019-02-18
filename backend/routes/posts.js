@@ -37,7 +37,8 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
   });
   post.save((err, result) => {
     if (err) {
-      return res.status(404).json({
+      return res.status(500).json({
+        message: 'failed',
         error: err
       });
     }
@@ -54,12 +55,14 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
 router.get('/:id', (req, res, next) => {
   Post.findById(req.params.id, (err, result) => {
     if (err) {
-      console.log(err);
+      res.status(500).json({
+        message: ' not found '
+      });
     }
     if (result) {
       res.status(200).json(result);
     } else {
-      res.status(404).json({
+      res.status(500).json({
         message: ' not found '
       });
     }
@@ -86,7 +89,7 @@ router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req
       });
     }
     if (result.nModified <= 0) {
-      return res.status(404).json({
+      return res.status(401).json({
         message: 'update failed'
       });
     }
@@ -118,19 +121,24 @@ router.get('', (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      res.status(500).json({
+        message: 'failed',
+        err: err
+      });
     });
 });
 
 router.delete('/:id', checkAuth, (req, res, next) => {
   Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }, (err, result) => {
     if (err) {
-      console.log(err);
-      return new Error('delete failed');
+      return res.status(500).json({
+        message: 'delete failed',
+        err: err
+      });
     }
     if (result.n <= 0) {
-      return res.status(404).json({
-        message: 'update failed'
+      return res.status(401).json({
+        message: 'delete failed , not Authorized'
       });
     }
     res.status(200).json({ message: 'Post deleted' });
