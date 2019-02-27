@@ -13,7 +13,8 @@ import {
   MatToolbarModule,
   MatExpansionModule,
   MatProgressSpinnerModule,
-  MatPaginatorModule
+  MatPaginatorModule,
+  MatDialogModule
 } from '@angular/material';
 import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './post-list/post-list.component';
@@ -22,6 +23,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { AuthInterceptor } from './auth-interceptor';
+import { ErrorInterceptor } from './error-interceptor';
+import { ErrorComponent } from './error/error.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,8 @@ import { AuthInterceptor } from './auth-interceptor';
     HeaderComponent,
     PostListComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -40,6 +44,7 @@ import { AuthInterceptor } from './auth-interceptor';
     BrowserAnimationsModule,
     MatInputModule,
     MatCardModule,
+    MatDialogModule,
     MatPaginatorModule,
     MatToolbarModule,
     MatExpansionModule,
@@ -47,8 +52,12 @@ import { AuthInterceptor } from './auth-interceptor';
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+  ],
   // identifier provided by the /common/http , and we tell angular for identifier that's the value(userclass:AuthInt..)
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [ErrorComponent] // dynamically loaded error component on the view
 })
 export class AppModule {}
