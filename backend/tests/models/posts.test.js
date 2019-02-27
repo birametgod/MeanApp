@@ -15,8 +15,9 @@ describe('test the posts path', () => {
         console.log('Connection failed !');
       });
   });
-  afterAll(done => {
+  afterEach(done => {
     mongoose.disconnect(done);
+    console.log('disconnected to database ');
   });
 
   describe('GET /', () => {
