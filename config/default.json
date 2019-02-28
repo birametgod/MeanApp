@@ -1,0 +1,4 @@
+{
+  "db": "mongodb+srv://birametgod:ID6nlTZu07PYxCbd@cluster0-c7tiq.mongodb.net/node-angular",
+  "JWT_KEY": "my_token_is_secret"
+}
