@@ -5,13 +5,14 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
-
+const config = require('config');
+const db = config.get('db');
 mongoose
-  .connect('mongodb+srv://birametgod:ID6nlTZu07PYxCbd@cluster0-c7tiq.mongodb.net/node-angular', {
+  .connect(db, {
     useNewUrlParser: true
   })
   .then(() => {
-    console.log('connected to database');
+    console.log(`connected to database ${db}`);
   })
   .catch(() => {
     console.log('Connection failed !');

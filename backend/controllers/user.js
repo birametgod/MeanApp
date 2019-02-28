@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const config = require('config');
+const JWT_KEY = config.get('JWT_KEY');
 
 exports.signUp = (req, res, next) => {
   bcrypt.hash(req.body.password, 10, (err, hash) => {
@@ -43,7 +45,7 @@ exports.loginUser = (req, res, next) => {
 
     userFetched = result;
     bcrypt.compare(req.body.password, userFetched.password).then(hash => {
-      const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, 'my_token_is_secret', {
+      const token = jwt.sign({ email: userFetched.email, userId: userFetched._id }, JWT_KEY, {
         expiresIn: '1h'
       });
 
