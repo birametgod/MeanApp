@@ -33,21 +33,6 @@ exports.readOnePost = async (req, res, next) => {
       error: error
     });
   return res.status(200).json(result);
-
-  // Post.findById(req.params.id, (err, result) => {
-  //   if (err) {
-  //     res.status(500).json({
-  //       message: ' not found '
-  //     });
-  //   }
-  //   if (result) {
-  //     res.status(200).json(result);
-  //   } else {
-  //     res.status(500).json({
-  //       message: ' not found '
-  //     });
-  //   }
-  // });
 };
 
 exports.updatePost = (req, res, next) => {
