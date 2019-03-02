@@ -7,6 +7,7 @@ const MIME_TYPE_MAP = {
   'image/jpg': 'jpg'
 };
 const checkAuth = require('../middleware/check-auth');
+const validateObjectId = require('../middleware/validateObjectId');
 const postController = require('../controllers/post');
 
 const storage = multer.diskStorage({
@@ -30,7 +31,7 @@ const storage = multer.diskStorage({
 
 router.post('', checkAuth, multer({ storage: storage }).single('image'), postController.createPost);
 
-router.get('/:id', postController.readOnePost);
+router.get('/:id', validateObjectId, postController.readOnePost);
 
 router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), postController.updatePost);
 

@@ -1,4 +1,3 @@
-const checkAuth = require('../middleware/check-auth');
 const Post = require('../models/post');
 
 exports.createPost = (req, res, next) => {
@@ -26,21 +25,29 @@ exports.createPost = (req, res, next) => {
   });
 };
 
-exports.readOnePost = (req, res, next) => {
-  Post.findById(req.params.id, (err, result) => {
-    if (err) {
-      res.status(500).json({
-        message: ' not found '
-      });
-    }
-    if (result) {
-      res.status(200).json(result);
-    } else {
-      res.status(500).json({
-        message: ' not found '
-      });
-    }
-  });
+exports.readOnePost = async (req, res, next) => {
+  const result = await Post.findById(req.params.id);
+  if (!result)
+    return res.status(500).json({
+      message: ' not found ',
+      error: error
+    });
+  return res.status(200).json(result);
+
+  // Post.findById(req.params.id, (err, result) => {
+  //   if (err) {
+  //     res.status(500).json({
+  //       message: ' not found '
+  //     });
+  //   }
+  //   if (result) {
+  //     res.status(200).json(result);
+  //   } else {
+  //     res.status(500).json({
+  //       message: ' not found '
+  //     });
+  //   }
+  // });
 };
 
 exports.updatePost = (req, res, next) => {
