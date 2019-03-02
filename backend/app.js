@@ -9,6 +9,7 @@ const config = require('config');
 const db = config.get('db');
 mongoose
   .connect(db, {
+    useCreateIndex: true,
     useNewUrlParser: true
   })
   .then(() => {
