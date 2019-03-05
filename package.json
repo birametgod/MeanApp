@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "start:server": "nodemon server.js",
-    "testBackend": "jest ./backend --watch --verbose"
+    "testBackend": "jest ./backend --watch --verbose --coverage"
   },
   "private": true,
   "dependencies": {
