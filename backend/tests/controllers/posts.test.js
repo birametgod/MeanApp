@@ -10,8 +10,8 @@ const JWT_KEY = config.get('JWT_KEY');
 let server;
 
 describe('test the posts path', () => {
-  beforeEach(() => {
-    mongoose
+  beforeEach(async () => {
+    await mongoose
       .connect(db, {
         useCreateIndex: true,
         useNewUrlParser: true
@@ -26,7 +26,7 @@ describe('test the posts path', () => {
   afterEach(async done => {
     await Post.deleteMany({});
     await User.deleteMany({});
-    mongoose.disconnect(done);
+    await mongoose.disconnect(done);
     console.log('disconnected to database ');
   });
   let post;
@@ -110,13 +110,35 @@ describe('test the posts path', () => {
   });
 
   describe('Post /', () => {
-    it('should return error 500 when i create post', async () => {
-      post = new Post({
-        post: 'JE SUIS LÀ',
-        imagePath: 'birou-1550358244311.jpg',
-        creator: '313'
+    it('should return  201 post added successfully', async () => {
+      const user = new User({
+        email: 'birame@email.com',
+        password: 'birame'
       });
-      const res = await exec();
+      await user.save();
+      const token = jwt.sign({ email: user.email, userId: user._id }, JWT_KEY, {
+        expiresIn: '1h'
+      });
+
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer ' + token)
+        .field('name', 'BIRAME')
+        .field('post', 'my awesome avatar')
+        .field('creator', '3242425525')
+        .attach('image', '/Users/mac/Downloads/mean-course/backend/images/birou-martin-1550361239715.png');
+      console.log(res.error);
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('Post /', () => {
+    it('should return error 500 when i create post', async () => {
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer ' + token)
+        .field('name', 'BIRAME')
+        .attach('image', '/Users/mac/Downloads/mean-course/backend/images/birou-martin-1550361239715.png');
       expect(res.status).toBe(500);
     });
   });
