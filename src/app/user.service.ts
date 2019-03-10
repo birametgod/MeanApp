@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { User } from './user';
+import { environment } from 'src/environments/environment';
+
+const BACKEND_URL = environment.apiUrl + '/user';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +23,7 @@ export class UserService {
       email: email,
       password: password
     };
-    this.http.post<{ message: string; result: User }>('http://localhost:3000/api/user/signup', user).subscribe(
+    this.http.post<{ message: string; result: User }>(BACKEND_URL + '/signup', user).subscribe(
       res => {
         this.route.navigate(['/']);
       },
@@ -62,13 +65,9 @@ export class UserService {
       password: password
     };
     this.http
-      .post<{ message: string; user: any; token: string; expiresIn: number }>(
-        'http://localhost:3000/api/user/login',
-        user
-      )
+      .post<{ message: string; user: any; token: string; expiresIn: number }>(BACKEND_URL + '/login', user)
       .subscribe(
         res => {
-          console.log(res);
           this.token = res.token;
           if (res.token) {
             this.setTimer(res.expiresIn);

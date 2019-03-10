@@ -54,9 +54,10 @@ exports.updatePost = (req, res, next) => {
         error: err
       });
     }
-    if (result.nModified <= 0) {
+    console.log(result);
+    if (result.n <= 0) {
       return res.status(401).json({
-        message: 'update failed'
+        message: 'update failed unauthorized'
       });
     }
     return res.status(200).json({
