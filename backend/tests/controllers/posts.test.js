@@ -127,7 +127,6 @@ describe('test the posts path', () => {
         .field('post', 'my awesome avatar')
         .field('creator', '3242425525')
         .attach('image', '/Users/mac/Downloads/mean-course/backend/images/birou-martin-1550361239715.png');
-      console.log(res.error);
       expect(res.status).toBe(201);
     });
   });
@@ -142,4 +141,6 @@ describe('test the posts path', () => {
       expect(res.status).toBe(500);
     });
   });
+
+  describe('Put /:id', () => {});
 });
