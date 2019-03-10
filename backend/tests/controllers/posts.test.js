@@ -7,6 +7,7 @@ const Post = require('../../models/post');
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
 const JWT_KEY = config.get('JWT_KEY');
+let server;
 
 describe('test the posts path', () => {
   beforeEach(async () => {
@@ -25,17 +26,32 @@ describe('test the posts path', () => {
   afterEach(async done => {
     await Post.deleteMany({});
     await User.deleteMany({});
-    mongoose.disconnect(done);
+    await mongoose.disconnect(done);
     console.log('disconnected to database ');
+  });
+  let post;
+  let token;
+  let user;
+  const exec = async () => {
+    return await request(app)
+      .post('/api/posts')
+      .set('Authorization', 'Bearer ' + token)
+      .send(post);
+  };
+
+  beforeEach(async () => {
+    user = new User({
+      email: 'YE@email.com',
+      password: 'birame'
+    });
+    await user.save();
+    token = jwt.sign({ email: user.email, userId: user._id }, JWT_KEY, {
+      expiresIn: '1h'
+    });
   });
 
   describe('GET /', () => {
     it('should return all posts', async () => {
-      const user = new User({
-        email: 'YE@email.com',
-        password: 'birame'
-      });
-      await user.save();
       await Post.collection.insertMany([
         {
           name: 'BIRAME',
@@ -59,12 +75,7 @@ describe('test the posts path', () => {
 
   describe('GET /:id', () => {
     it('should return one post', async () => {
-      const user = new User({
-        email: 'birame@email.com',
-        password: 'birame'
-      });
-      await user.save();
-      const post = new Post({
+      post = new Post({
         name: 'BIRAME',
         post: 'JE SUIS LÀ',
         imagePath: 'birou-1550358244311.jpg',
@@ -85,22 +96,21 @@ describe('test the posts path', () => {
   });
 
   describe('Post /', () => {
-    it('should return error 401 unauthorized when i create post', async () => {
-      const post = new Post({
+    it('should return error 401 unauthorized if client is not logged in', async () => {
+      token = null;
+      post = new Post({
         name: 'BIRAME',
         post: 'JE SUIS LÀ',
         imagePath: 'birou-1550358244311.jpg',
         creator: '313'
       });
-      const res = await request(app)
-        .post('/api/posts')
-        .send(post);
+      const res = await exec();
       expect(res.status).toBe(401);
     });
   });
 
   describe('Post /', () => {
-    it('should return error 500 when i create post', async () => {
+    it('should return  201 post added successfully', async () => {
       const user = new User({
         email: 'birame@email.com',
         password: 'birame'
@@ -109,16 +119,28 @@ describe('test the posts path', () => {
       const token = jwt.sign({ email: user.email, userId: user._id }, JWT_KEY, {
         expiresIn: '1h'
       });
-      const post = new Post({
-        post: 'JE SUIS LÀ',
-        imagePath: 'birou-1550358244311.jpg',
-        creator: '313'
-      });
+
       const res = await request(app)
         .post('/api/posts')
         .set('Authorization', 'Bearer ' + token)
-        .send(post);
+        .field('name', 'BIRAME')
+        .field('post', 'my awesome avatar')
+        .field('creator', '3242425525')
+        .attach('image', '/Users/mac/Downloads/mean-course/backend/images/birou-martin-1550361239715.png');
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe('Post /', () => {
+    it('should return error 500 when i create post', async () => {
+      const res = await request(app)
+        .post('/api/posts')
+        .set('Authorization', 'Bearer ' + token)
+        .field('name', 'BIRAME')
+        .attach('image', '/Users/mac/Downloads/mean-course/backend/images/birou-martin-1550361239715.png');
       expect(res.status).toBe(500);
     });
   });
+
+  describe('Put /:id', () => {});
 });

@@ -1,6 +1,6 @@
 const Post = require('../models/post');
 
-exports.createPost = (req, res, next) => {
+exports.createPost = async (req, res, next) => {
   const url = req.protocol + '://' + req.get('host');
   const post = new Post({
     name: req.body.name,
@@ -8,13 +8,8 @@ exports.createPost = (req, res, next) => {
     imagePath: url + '/images/' + req.file.filename,
     creator: req.userData.userId
   });
-  post.save((err, result) => {
-    if (err) {
-      return res.status(500).json({
-        message: 'failed',
-        error: err
-      });
-    }
+  try {
+    const result = await post.save();
     return res.status(201).json({
       message: 'post added successfully',
       post: {
@@ -22,15 +17,31 @@ exports.createPost = (req, res, next) => {
         id: result._id
       }
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'failed',
+      error
+    });
+  }
+  // post.save((err, result) => {
+  //   if (err) {
+
+  //   }
+  //   return res.status(201).json({
+  //     message: 'post added successfully',
+  //     post: {
+  //       ...result,
+  //       id: result._id
+  //     }
+  //   });
+  // });
 };
 
 exports.readOnePost = async (req, res, next) => {
   const result = await Post.findById(req.params.id);
   if (!result)
     return res.status(500).json({
-      message: ' not found ',
-      error: error
+      message: ' not found '
     });
   return res.status(200).json(result);
 };
