@@ -8,7 +8,7 @@
 # dependencies
 node_modules/
 /coverage
-nodemon.json/
+nodemon.json
 
 
 # profiling files
