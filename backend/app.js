@@ -5,15 +5,13 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
-const config = require('config');
-const db = config.get('db');
 mongoose
-  .connect(db, {
+  .connect('mongodb+srv://birametgod:' + process.env.MONGO_ATLAS_PW + '@cluster0-c7tiq.mongodb.net/node-angular', {
     useCreateIndex: true,
     useNewUrlParser: true
   })
   .then(() => {
-    console.log(`connected to database ${db}`);
+    console.log(`connected to database`);
   })
   .catch(() => {
     console.log('Connection failed !');
